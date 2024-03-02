@@ -5,8 +5,8 @@ function App() {
   return (
     <ThemeProvider>
       <div className="h-screen grid place-items-center bg-background text-foreground">
-        <div className="flex flex-col gap-4 items-center">
-          <h1>Pointing stuff</h1>
+        <div className="flex flex-col gap-8 items-center">
+          <h1 className="text-4xl font-bold">Pointing stuff</h1>
           <Pointing />
         </div>
       </div>
