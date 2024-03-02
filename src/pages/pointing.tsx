@@ -2,10 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Moment } from "@/components/ui/moment";
 import { Textarea } from "@/components/ui/textarea";
+import { Link, useParams } from "react-router-dom";
 
 export const Pointing = () => {
+  const { sessionId } = useParams();
   return (
     <div className="flex flex-col gap-8">
+      <h1 className="text-4xl font-bold">Pointing stuff</h1>
       <div className="flex flex-col gap-2">
         <Label htmlFor="story-description">Story description</Label>
         <Textarea id="story-description" placeholder="As a user..." />
@@ -55,12 +58,16 @@ export const Pointing = () => {
           {
             uid: "aklsjdflkjsadlfkj",
             description: "As a user I want to see the list of stories",
-            startedAt: "2023-01-01T00:00:00Z",
+            startedAt: "2024-03-02 22:20",
             endedAt: "2023-01-01T00:00:00Z",
           },
         ].map(({ uid, startedAt }) => (
           <li key={uid} className="flex gap-4 max-w-[24ch]">
-            <Moment dateTime={startedAt} />
+            <Button variant="link" size="auto" asChild>
+              <Link to={`/pointing/${sessionId}/stats/${uid}`}>
+                <Moment dateTime={startedAt} />
+              </Link>
+            </Button>
           </li>
         ))}
       </ul>
