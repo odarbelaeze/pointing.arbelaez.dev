@@ -41,7 +41,7 @@ export const Pointing = () => {
               {name}
             </span>
             <div
-              className="flex-shrink-0 bg-foreground w-8 h-4"
+              className="flex-shrink-0 bg-foreground w-8 h-4 rounded-md"
               aria-label="hidden vote"
             />
           </li>
