@@ -1,30 +1,35 @@
-import { Button } from "./components/ui/button";
-import viteLogo from "/vite.svg";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [darkMode, setDarkMode] = useState(false);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
+    <div
+      className={cn(
+        "h-screen grid place-items-center bg-background text-foreground",
+        { dark: darkMode },
+      )}
+    >
+      <div className="flex flex-col gap-4 items-center">
+        <h1>Vite + React</h1>
         <Button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </Button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <div className="flex gap-2 items-center">
+          <Switch
+            id="dark-mode"
+            checked={darkMode}
+            onCheckedChange={() => setDarkMode((pv) => !pv)}
+          />
+          <Label htmlFor="dark-mode">Dark mode</Label>
+        </div>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   );
 }
 
