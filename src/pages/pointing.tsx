@@ -1,24 +1,15 @@
+import { Ballot } from "@/components/ballot";
+import { Stats } from "@/components/stats";
+import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Moment } from "@/components/ui/moment";
 import { Textarea } from "@/components/ui/textarea";
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-type Story = {
-  description: string;
-  startedAt: string;
-  endedAt: string;
-  participants: { [uid: string]: { name: string } };
-  votes: { [uid: string]: number | "?" | null };
-};
-
-type PointingSession = {
-  currentStory: Omit<Story, "endedAt">;
-  history: Story[];
-};
-
-export const Pointing = () => {
+export const PointingPage = () => {
   const { sessionId } = useParams();
   const [session, setSession] = useState<PointingSession | null>(null);
   const [description, setDescription] = useState("");
@@ -31,10 +22,11 @@ export const Pointing = () => {
         participants: {
           aasawer234234asdf: { name: "John" },
           aklsjdflkjsadlfkj: { name: "Jane" },
+          aklsjdflkjsadrfkj: { name: "Dave" },
         },
         votes: {
           aasawer234234asdf: 5,
-          aklsjdflkjsadlfkj: "?",
+          aklsjdflkjsadlfkj: 5,
         },
       },
       history: [],
@@ -83,59 +75,27 @@ export const Pointing = () => {
         </Button>
         <Button className="flex-grow">Reveal votes</Button>
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        {[1, 2, 3, 5, 8, 13, 21, 34, "?"].map((i) => (
-          <Button key={i} onClick={() => console.log(i)}>
-            {i}
-          </Button>
-        ))}
-      </div>
-      <ul className="flex flex-col gap-2">
-        {Object.entries(session.currentStory.participants).map(
-          ([uid, { name }]) => (
-            <li key={uid} className="flex gap-4 items-center max-w-[24ch]">
-              <span
-                title={name}
-                className="flex-grow whitespace-nowrap overflow-hidden overflow-ellipsis"
-              >
-                {name}
-              </span>
-              {allVoted ? (
-                <span>{session.currentStory.votes[uid]}</span>
-              ) : (
-                <div
-                  className="flex-shrink-0 bg-foreground w-8 h-4 rounded-md"
-                  aria-label="hidden vote"
-                />
-              )}
+      {allVoted ? (
+        <Stats
+          story={{ ...session.currentStory, endedAt: moment().toISOString() }}
+        />
+      ) : (
+        <Ballot onVote={console.log} />
+      )}
+      <Tally story={session.currentStory} />
+      {Object.entries(session.history).length > 0 && (
+        <ul className="flex flex-col gap-2 list-disc">
+          {Object.entries(session.history).map(([uid, { startedAt }]) => (
+            <li key={uid} className="flex gap-4 max-w-[24ch]">
+              <Button variant="link" size="auto" asChild>
+                <Link to={`/pointing/${sessionId}/stats/${uid}`}>
+                  <Moment dateTime={startedAt} />
+                </Link>
+              </Button>
             </li>
-          ),
-        )}
-      </ul>
-      <ul className="flex flex-col gap-2 list-disc">
-        {[
-          {
-            uid: "aasawer234234asdf",
-            description: "As a user I want to see the list of stories",
-            startedAt: "2024-03-02 21:23",
-            endedAt: "2022-01-01T00:00:00Z",
-          },
-          {
-            uid: "aklsjdflkjsadlfkj",
-            description: "As a user I want to see the list of stories",
-            startedAt: "2024-03-02 22:20",
-            endedAt: "2023-01-01T00:00:00Z",
-          },
-        ].map(({ uid, startedAt }) => (
-          <li key={uid} className="flex gap-4 max-w-[24ch]">
-            <Button variant="link" size="auto" asChild>
-              <Link to={`/pointing/${sessionId}/stats/${uid}`}>
-                <Moment dateTime={startedAt} />
-              </Link>
-            </Button>
-          </li>
-        ))}
-      </ul>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

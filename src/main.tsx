@@ -1,8 +1,8 @@
 import "./index.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { Home } from "@/pages/home";
-import { Pointing } from "@/pages/pointing";
-import { Stats } from "@/pages/stats";
+import { HomePage } from "@/pages/home";
+import { PointingPage } from "@/pages/pointing";
+import { StatsPage } from "@/pages/stats";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
@@ -10,15 +10,15 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <HomePage />,
   },
   {
     path: "/pointing/:sessionId",
-    element: <Pointing />,
+    element: <PointingPage />,
   },
   {
     path: "/pointing/:sessionId/stats/:storyId",
-    element: <Stats />,
+    element: <StatsPage />,
   },
   {
     path: "*",

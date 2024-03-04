@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link, useParams } from "react-router-dom";
 
-export const Stats = () => {
+export const StatsPage = () => {
   const { sessionId } = useParams();
   return (
     <div className="flex flex-col gap-8">

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAsyncFn } from "react-use";
 
-export const Home = () => {
+export const HomePage = () => {
   const navigate = useNavigate();
 
   const [state, createSession] = useAsyncFn(async () => {
