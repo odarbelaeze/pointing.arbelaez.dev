@@ -1,4 +1,5 @@
 import "./index.css";
+import { FirebaseProvider } from "@/components/providers/firebase-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { HomePage } from "@/pages/home";
 import { PointingPage } from "@/pages/pointing";
@@ -28,10 +29,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <div className="min-h-screen grid place-items-center bg-background text-foreground">
-        <RouterProvider router={router} />
-      </div>
-    </ThemeProvider>
+    <FirebaseProvider>
+      <ThemeProvider>
+        <div className="min-h-screen grid place-items-center bg-background text-foreground">
+          <RouterProvider router={router} />
+        </div>
+      </ThemeProvider>
+    </FirebaseProvider>
   </React.StrictMode>,
 );
