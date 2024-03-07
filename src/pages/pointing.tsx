@@ -1,4 +1,5 @@
 import { Ballot } from "@/components/ballot";
+import { History } from "@/components/history";
 import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ export const PointingPage = () => {
           aklsjdflkjsadlfkj: 5,
         },
       },
-      history: [],
+      history: {},
     };
     const timeout = setTimeout(() => {
       setSession(session);
@@ -43,6 +44,10 @@ export const PointingPage = () => {
     }
     setDescription(session.currentStory.description);
   }, [session]);
+
+  if (!sessionId) {
+    return <div>Invalid session</div>;
+  }
 
   if (!session) {
     return <div>Loading...</div>;
@@ -83,19 +88,7 @@ export const PointingPage = () => {
         <Ballot onVote={console.log} />
       )}
       <Tally story={session.currentStory} />
-      {Object.entries(session.history).length > 0 && (
-        <ul className="flex flex-col gap-2 list-disc">
-          {Object.entries(session.history).map(([uid, { startedAt }]) => (
-            <li key={uid} className="flex gap-4 max-w-[24ch]">
-              <Button variant="link" size="auto" asChild>
-                <Link to={`/pointing/${sessionId}/stats/${uid}`}>
-                  <Moment dateTime={startedAt} />
-                </Link>
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <History sessionId={sessionId} history={session.history} />
     </div>
   );
 };

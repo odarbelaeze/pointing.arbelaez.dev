@@ -4,13 +4,13 @@ type Story = {
   description: string;
   startedAt: string;
   endedAt: string;
-  participants: { [uid: string]: { name: string } };
-  votes: { [uid: string]: number | "?" };
+  participants: Record<string, { name: string }>;
+  votes: Record<string, number | "?">;
 };
 
 type OpenStory = Omit<Story, "endedAt">;
 
 type PointingSession = {
   currentStory: OpenStory;
-  history: Story[];
+  history: Record<string, Story>;
 };
