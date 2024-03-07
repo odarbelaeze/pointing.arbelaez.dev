@@ -4,11 +4,10 @@ import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Moment } from "@/components/ui/moment";
 import { Textarea } from "@/components/ui/textarea";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export const PointingPage = () => {
   const { sessionId } = useParams();
