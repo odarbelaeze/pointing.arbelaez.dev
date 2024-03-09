@@ -1,3 +1,4 @@
+import { useFirebase } from "@/hooks/firebase";
 import { RxCheck } from "react-icons/rx";
 
 interface TallyProps {
@@ -5,9 +6,13 @@ interface TallyProps {
 }
 
 export const Tally = ({ story }: TallyProps) => {
+  const { user } = useFirebase();
   const allVoted = Object.keys(story.participants || {}).every(
     (uid) => story.votes && !!story.votes[uid],
   );
+  if (!user || user === "loading") {
+    return null;
+  }
   return (
     <ul className="flex flex-col gap-2">
       {Object.entries(story.participants || {}).map(([uid, { name }]) => (
@@ -24,7 +29,7 @@ export const Tally = ({ story }: TallyProps) => {
               {name}
             </span>
           </div>
-          {allVoted ? (
+          {allVoted || story.votes && story.votes[uid] && uid === user.uid ? (
             <span>{story.votes && story.votes[uid]}</span>
           ) : (
             <div
