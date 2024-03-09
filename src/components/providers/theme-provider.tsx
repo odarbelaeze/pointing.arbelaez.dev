@@ -16,10 +16,10 @@ interface ThemeProviderState {
 
 const initialState: ThemeProviderState = {
   theme: "system",
-  setTheme: () => {},
+  setTheme: () => { },
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+export const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export const ThemeProvider = ({
   children,

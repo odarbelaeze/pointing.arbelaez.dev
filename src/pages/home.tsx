@@ -1,13 +1,26 @@
 import { Button } from "@/components/ui/button";
+import { useFirebase } from "@/hooks/firebase";
+import { ref, push } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { useAsyncFn } from "react-use";
 
 export const HomePage = () => {
   const navigate = useNavigate();
+  const { db, user } = useFirebase();
 
   const [state, createSession] = useAsyncFn(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    navigate("/pointing/1234");
+    if (!user || user === "loading") {
+      return;
+    }
+    push(ref(db, "sessions"), {
+      currentStory: {
+        description: "",
+        startedAt: (new Date()).toISOString(),
+        participants: {},
+      },
+      history: {},
+    });
+    // navigate(`/session/${sessionRef.key}`);
   }, [navigate]);
 
   return (

@@ -1,7 +1,7 @@
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import { ReCaptchaV3Provider, initializeAppCheck } from "firebase/app-check";
-import { User, getAuth } from "firebase/auth";
+import { User, getAuth, signInAnonymously } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
 
@@ -51,7 +51,7 @@ const initialState: FirebaseProviderState = {
   user: null,
 };
 
-const FirebaseContext = createContext<FirebaseProviderState>(initialState);
+export const FirebaseContext = createContext<FirebaseProviderState>(initialState);
 
 export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
   const [user, setUser] = useState<User | 'loading' | null>('loading');
@@ -62,6 +62,20 @@ export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
     });
     return () => unsubscribe();
   }, []);
+  useEffect(() => {
+    if (user !== null) {
+      return;
+    }
+    signInAnonymously(auth).catch((error) => {
+      console.error('Failed to sign in anonymously', error);
+    });
+  }, [user]);
+  if (user === 'loading') {
+    return <div>Loading...</div>;
+  }
+  if (user === null) {
+    return <div>Failed to sign in anonymously</div>;
+  }
   return (
     <FirebaseContext.Provider value={value}>
       {children}
