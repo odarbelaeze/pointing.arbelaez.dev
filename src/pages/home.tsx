@@ -12,7 +12,7 @@ export const HomePage = () => {
     if (!user || user === "loading") {
       return;
     }
-    push(ref(db, "sessions"), {
+    const sessionRef = push(ref(db, "sessions"), {
       currentStory: {
         description: "",
         startedAt: (new Date()).toISOString(),
@@ -20,7 +20,7 @@ export const HomePage = () => {
       },
       history: {},
     });
-    // navigate(`/session/${sessionRef.key}`);
+    navigate(`/pointing/${sessionRef.key}`);
   }, [navigate]);
 
   return (
