@@ -5,12 +5,12 @@ interface StatsProps {
 }
 
 export const Stats = ({ story }: StatsProps) => {
-  const votes = Object.values(story.votes);
+  const votes = Object.values(story.votes || {});
   const numericVotes = votes.filter((v) => v !== "?") as number[];
   const average =
     numericVotes.reduce((acc, x) => acc + x, 0) / numericVotes.length;
   const consensus = votes.every((v) => v === votes[0] && v !== "?");
-  const voteFrequency = Object.values(story.votes).reduce(
+  const voteFrequency = Object.values(story.votes || {}).reduce(
     (acc: { [key: number]: number }, v) => ({
       ...acc,
       [v]: (acc[v as number] || 0) + 1,

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
 import { ref, push } from "firebase/database";
+import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { useAsyncFn } from "react-use";
 
@@ -12,16 +13,19 @@ export const HomePage = () => {
     if (!user || user === "loading") {
       return;
     }
-    const sessionRef = push(ref(db, "sessions"), {
+    const newSession = {
+      owner: user.uid,
       currentStory: {
         description: "",
-        startedAt: (new Date()).toISOString(),
+        startedAt: moment().utc().toISOString(),
         participants: {},
+        votes: {},
       },
       history: {},
-    });
+    };
+    const sessionRef = await push(ref(db, "sessions"), newSession);
     navigate(`/pointing/${sessionRef.key}`);
-  }, [navigate]);
+  }, [navigate, user, db]);
 
   return (
     <div className="flex flex-col gap-8 items-center">

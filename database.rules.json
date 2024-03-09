@@ -4,7 +4,69 @@
     "sessions": {
       "$session": {
         ".read": "auth != null",
-        ".write": "auth != null"
+        ".write": "auth != null",
+        "owner": {
+          ".validate": "auth.uid === newData.val() && newData.isString() && newData.val().length <= 100"
+        },
+        "currentStory": {
+          "description": {
+            ".validate": "newData.isString() && newData.val().length <= 1000"
+          },
+          "startedAt": {
+            ".validate": "newData.isString() && newData.val().length <= 100"
+          },
+          "participants": {
+            "$participant": {
+              ".write": "auth.uid === $participant",
+              ".validate": "auth.uid === $participant",
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 100"
+              },
+              "joinedAt": {
+                ".validate": "newData.isString() && newData.val().length <= 100"
+              },
+              "$other": { ".validate": false }
+            }
+          },
+          "votes": {
+            "$vote": {
+              ".write": "auth.uid === $vote",
+              ".validate": "auth.uid === $vote && (newData.isNumber() || (newData.isString() && newData.val() === '?'))"
+            }
+          },
+          "$other": { ".validate": false }
+        },
+        "history": {
+          "$story": {
+            "description": {
+              ".validate": "newData.isString() && newData.val().length <= 1000"
+            },
+            "startedAt": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "endedAt": {
+              ".validate": "newData.isString() && newData.val().length <= 100"
+            },
+            "participants": {
+              "$participant": {
+                "name": {
+                  ".validate": "newData.isString() && newData.val().length <= 100"
+                },
+                "joinedAt": {
+                  ".validate": "newData.isString() && newData.val().length <= 100"
+                },
+                "$other": { ".validate": false }
+              }
+            },
+            "votes": {
+              "$vote": {
+                ".validate": "newData.isNumber() || (newData.isString() && newData.val() === '?')"
+              }
+            },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".validate": false }
       }
     }
   }

@@ -1,8 +1,13 @@
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import { ReCaptchaV3Provider, initializeAppCheck } from "firebase/app-check";
-import { User, getAuth, signInAnonymously } from "firebase/auth";
-import { getDatabase } from "firebase/database";
+import {
+  User,
+  connectAuthEmulator,
+  getAuth,
+  signInAnonymously,
+} from "firebase/auth";
+import { connectDatabaseEmulator, getDatabase } from "firebase/database";
 import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
 
 const firebaseConfig = {
@@ -18,9 +23,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-if (import.meta.env.MODE === 'development') {
-  console.info('Development mode detected, using debug token');
-  self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN;
+if (import.meta.env.MODE === "development") {
+  console.info("Development mode detected, using debug token");
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN =
+    import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN;
 }
 const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider("6LfLTZApAAAAAMJH2libaBDoAkJat64-BEE2kGJk"),
@@ -28,6 +34,12 @@ const appCheck = initializeAppCheck(app, {
 });
 const db = getDatabase(app);
 const auth = getAuth(app);
+
+if (import.meta.env.VITE_USE_EMULATORS === "true") {
+  console.info("Using firebase emulators");
+  connectAuthEmulator(auth, "http://localhost:9099");
+  connectDatabaseEmulator(db, "localhost", 9000);
+}
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -39,7 +51,7 @@ interface FirebaseProviderState {
   appCheck: typeof appCheck;
   db: typeof db;
   auth: typeof auth;
-  user: User | 'loading' | null;
+  user: User | "loading" | null;
 }
 
 const initialState: FirebaseProviderState = {
@@ -51,10 +63,11 @@ const initialState: FirebaseProviderState = {
   user: null,
 };
 
-export const FirebaseContext = createContext<FirebaseProviderState>(initialState);
+export const FirebaseContext =
+  createContext<FirebaseProviderState>(initialState);
 
 export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
-  const [user, setUser] = useState<User | 'loading' | null>('loading');
+  const [user, setUser] = useState<User | "loading" | null>("loading");
   const value = useMemo(() => ({ ...initialState, user }), [user]);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -67,10 +80,10 @@ export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
       return;
     }
     signInAnonymously(auth).catch((error) => {
-      console.error('Failed to sign in anonymously', error);
+      console.error("Failed to sign in anonymously", error);
     });
   }, [user]);
-  if (user === 'loading') {
+  if (user === "loading") {
     return <div>Loading...</div>;
   }
   if (user === null) {

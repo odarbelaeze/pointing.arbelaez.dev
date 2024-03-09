@@ -1,60 +1,103 @@
 import { Ballot } from "@/components/ballot";
 import { History } from "@/components/history";
+import { JoinSession } from "@/components/join-session";
 import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useFirebase } from "@/hooks/firebase";
+import { onValue, push, ref, set } from "firebase/database";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useAsyncFn } from "react-use";
 
 export const PointingPage = () => {
   const { sessionId } = useParams();
-  const [session, setSession] = useState<PointingSession | null>(null);
+  const [session, setSession] = useState<PointingSession | "loading" | null>(
+    null,
+  );
   const [description, setDescription] = useState("");
 
-  useEffect(() => {
-    const session: PointingSession = {
-      currentStory: {
-        description: "As a user I want to see the list of stories",
-        startedAt: "2024-03-02 21:23",
-        participants: {
-          aasawer234234asdf: { name: "John" },
-          aklsjdflkjsadlfkj: { name: "Jane" },
-          aklsjdflkjsadrfkj: { name: "Dave" },
-        },
-        votes: {
-          aasawer234234asdf: 5,
-          aklsjdflkjsadlfkj: 5,
-        },
-      },
-      history: {},
-    };
-    const timeout = setTimeout(() => {
-      setSession(session);
-    }, 1000);
-    return () => clearTimeout(timeout);
-  }, [sessionId]);
+  const { db, user } = useFirebase();
 
   useEffect(() => {
-    if (!session) {
+    if (!sessionId) {
       return;
     }
-    setDescription(session.currentStory.description);
+    const sessionRef = ref(db, `sessions/${sessionId}`);
+    const unsubscribe = onValue(sessionRef, (snapshot) => {
+      if (!snapshot.exists()) {
+        setSession(null);
+        return;
+      }
+      setSession({
+        owner: "anonymous",
+        currentStory: {},
+        history: {},
+        ...snapshot.val(),
+      });
+    });
+    return unsubscribe;
+  }, [sessionId, db]);
+
+  useEffect(() => {
+    if (!session || session === "loading") {
+      return;
+    }
+    setDescription(session.currentStory.description || "");
   }, [session]);
 
-  if (!sessionId) {
+  const [saveStoryState, saveStory] = useAsyncFn(async () => {
+    if (!sessionId || !description) {
+      return;
+    }
+    await set(
+      ref(db, `sessions/${sessionId}/currentStory/description`),
+      description,
+    );
+  }, [sessionId, description]);
+
+  const allVoted = useMemo(() => {
+    if (!session || session === "loading") {
+      return false;
+    }
+    return Object.keys(session.currentStory.participants || {}).every(
+      (uid) => session.currentStory.votes && !!session.currentStory.votes[uid],
+    );
+  }, [session]);
+
+  const [clearState, clear] = useAsyncFn(async () => {
+    if (!sessionId || !session || session === "loading" || !allVoted) {
+      return;
+    }
+    const newStory = {
+      endedAt: moment().utc().toISOString(),
+      ...session.currentStory,
+    };
+    await push(ref(db, `sessions/${sessionId}/history`), newStory);
+    await set(ref(db, `sessions/${sessionId}/currentStory/votes`), {});
+    await set(
+      ref(db, `sessions/${sessionId}/currentStory/startedAt`),
+      moment().utc().toISOString(),
+    );
+  }, [sessionId, session, db, allVoted]);
+
+  if (!sessionId || session === null) {
     return <div>Invalid session</div>;
   }
 
-  if (!session) {
+  if (!session || !user || user === "loading" || session === "loading") {
     return <div>Loading...</div>;
   }
 
-  const allVoted = Object.keys(session.currentStory.participants).every(
-    (uid) => !!session.currentStory.votes[uid],
-  );
+  if (
+    !session.currentStory.participants ||
+    !session.currentStory.participants[user.uid]
+  ) {
+    return <JoinSession sessionId={sessionId} />;
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -67,24 +110,32 @@ export const PointingPage = () => {
             setDescription(e.target.value);
           }}
           onBlur={() => {
-            console.log("Save description");
+            saveStory();
           }}
+          disabled={saveStoryState.loading}
           id="story-description"
           placeholder="As a user..."
         />
       </div>
       <div className="flex gap-2">
-        <Button variant="destructive" className="flex-grow">
+        <Button
+          disabled={clearState.loading || !allVoted}
+          onClick={clear}
+          variant="destructive"
+          className="flex-grow"
+        >
           Clear votes
         </Button>
-        <Button className="flex-grow">Reveal votes</Button>
       </div>
       {allVoted ? (
         <Stats
-          story={{ ...session.currentStory, endedAt: moment().toISOString() }}
+          story={{
+            ...session.currentStory,
+            endedAt: moment().utc().toISOString(),
+          }}
         />
       ) : (
-        <Ballot onVote={console.log} />
+        <Ballot sessionId={sessionId} />
       )}
       <Tally story={session.currentStory} />
       <History sessionId={sessionId} history={session.history} />
