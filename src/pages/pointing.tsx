@@ -82,6 +82,10 @@ export const PointingPage = () => {
       ref(db, `sessions/${sessionId}/currentStory/startedAt`),
       moment().utc().toISOString(),
     );
+    await set(
+      ref(db, `sessions/${sessionId}/currentStory/description`),
+      "",
+    );
   }, [sessionId, session, db, allVoted]);
 
   if (!sessionId || session === null) {
