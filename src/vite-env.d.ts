@@ -10,7 +10,6 @@ interface ImportMeta {
 }
 
 type Story = {
-  description?: string;
   startedAt?: string;
   endedAt?: string;
   participants?: Record<string, { name: string }>;

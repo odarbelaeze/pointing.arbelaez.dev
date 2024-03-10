@@ -4,8 +4,6 @@ import { JoinSession } from "@/components/join-session";
 import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useFirebase } from "@/hooks/firebase";
 import { onValue, push, ref, set } from "firebase/database";
 import moment from "moment";
@@ -18,7 +16,6 @@ export const PointingPage = () => {
   const [session, setSession] = useState<PointingSession | "loading" | null>(
     null,
   );
-  const [description, setDescription] = useState("");
 
   const { db, user } = useFirebase();
 
@@ -41,23 +38,6 @@ export const PointingPage = () => {
     });
     return unsubscribe;
   }, [sessionId, db]);
-
-  useEffect(() => {
-    if (!session || session === "loading") {
-      return;
-    }
-    setDescription(session.currentStory.description || "");
-  }, [session]);
-
-  const [saveStoryState, saveStory] = useAsyncFn(async () => {
-    if (!sessionId || !description) {
-      return;
-    }
-    await set(
-      ref(db, `sessions/${sessionId}/currentStory/description`),
-      description,
-    );
-  }, [sessionId, description]);
 
   const allVoted = useMemo(() => {
     if (!session || session === "loading") {
@@ -82,10 +62,6 @@ export const PointingPage = () => {
       ref(db, `sessions/${sessionId}/currentStory/startedAt`),
       moment().utc().toISOString(),
     );
-    await set(
-      ref(db, `sessions/${sessionId}/currentStory/description`),
-      "",
-    );
   }, [sessionId, session, db, allVoted]);
 
   if (!sessionId || session === null) {
@@ -106,21 +82,6 @@ export const PointingPage = () => {
   return (
     <div className="flex flex-col gap-8">
       <h1 className="text-4xl font-bold">Pointing stuff</h1>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="story-description">Story description</Label>
-        <Textarea
-          value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
-          onBlur={() => {
-            saveStory();
-          }}
-          disabled={saveStoryState.loading}
-          id="story-description"
-          placeholder="As a user..."
-        />
-      </div>
       <div className="flex gap-2">
         <Button
           disabled={clearState.loading || !allVoted}

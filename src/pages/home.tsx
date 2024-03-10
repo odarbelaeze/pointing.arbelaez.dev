@@ -16,7 +16,6 @@ export const HomePage = () => {
     const newSession = {
       owner: user.uid,
       currentStory: {
-        description: "",
         startedAt: moment().utc().toISOString(),
         participants: {},
         votes: {},
