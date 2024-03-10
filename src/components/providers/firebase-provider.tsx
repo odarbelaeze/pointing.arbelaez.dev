@@ -70,12 +70,14 @@ FirebaseContext.displayName = "FirebaseContext";
 export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
   const [user, setUser] = useState<User | "loading" | null>("loading");
   const value = useMemo(() => ({ ...initialState, user }), [user]);
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
     });
     return () => unsubscribe();
   }, []);
+
   useEffect(() => {
     if (user !== null) {
       return;
@@ -84,12 +86,15 @@ export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
       console.error("Failed to sign in anonymously", error);
     });
   }, [user]);
+
   if (user === "loading") {
     return <div>Loading...</div>;
   }
+
   if (user === null) {
-    return <div>Failed to sign in anonymously</div>;
+    return <div>Signing you in anonymously...</div>;
   }
+
   return (
     <FirebaseContext.Provider value={value}>
       {children}

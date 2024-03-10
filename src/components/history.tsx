@@ -22,7 +22,7 @@ export const History = ({ history, sessionId }: HistoryProps) => {
   });
 
   if (stories.length === 0) {
-    return <div>No sessions saved yet...</div>;
+    return <div>No stories pointed yet...</div>;
   }
 
   return (

@@ -29,12 +29,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <FirebaseProvider>
-      <ThemeProvider>
-        <div className="min-h-screen grid place-items-center bg-background text-foreground">
-          <RouterProvider router={router} />
-        </div>
-      </ThemeProvider>
-    </FirebaseProvider>
+    <ThemeProvider>
+      <FirebaseProvider>
+        <RouterProvider router={router} />
+      </FirebaseProvider>
+    </ThemeProvider>
   </React.StrictMode>,
 );

@@ -58,7 +58,7 @@ export const ThemeProvider = ({
 
   return (
     <ThemeProviderContext.Provider value={value}>
-      <div className={cn({ dark: finalTheme === "dark" })}>{children}</div>
+      <div className={cn("min-h-screen grid place-items-center bg-background text-foreground", { dark: finalTheme === "dark" })}>{children}</div>
     </ThemeProviderContext.Provider>
   );
 };
