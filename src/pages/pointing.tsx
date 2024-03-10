@@ -53,15 +53,15 @@ export const PointingPage = () => {
       return;
     }
     const newStory = {
-      endedAt: moment().utc().toISOString(),
       ...session.currentStory,
+      endedAt: moment().utc().toISOString(),
     };
     await push(ref(db, `sessions/${sessionId}/history`), newStory);
-    await set(ref(db, `sessions/${sessionId}/currentStory/votes`), {});
-    await set(
-      ref(db, `sessions/${sessionId}/currentStory/startedAt`),
-      moment().utc().toISOString(),
-    );
+    await set(ref(db, `sessions/${sessionId}/currentStory`), {
+      ...session.currentStory,
+      votes: {},
+      startedAt: moment().utc().toISOString(),
+    });
   }, [sessionId, session, db, allVoted]);
 
   if (!sessionId || session === null) {

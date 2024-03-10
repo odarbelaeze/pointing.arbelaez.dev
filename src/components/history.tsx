@@ -26,8 +26,8 @@ export const History = ({ history, sessionId }: HistoryProps) => {
   }
 
   return (
-    <div>
-      <h2>History</h2>
+    <div className="flex flex-col gap-4">
+      <h2 className="text-2xl font-bold">History</h2>
       <ul className="flex flex-col gap-2 list-disc">
         {stories.map(([uid, { startedAt }]) => (
           <li key={uid} className="flex gap-4 max-w-[24ch]">

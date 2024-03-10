@@ -18,25 +18,25 @@ export const Stats = ({ story }: StatsProps) => {
     {},
   );
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between">
-        <span>Time taken</span>
+    <div className="flex flex-col gap-2 min-w-52">
+      <div className="flex justify-between gap-2">
+        <span>Time taken</span>{" "}
         <span>
           {moment
             .duration(moment(story.endedAt).diff(moment(story.startedAt)))
             .humanize()}
         </span>
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-2">
         <span>Average</span>
         <span>{average}</span>
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-2">
         <strong>Points</strong>
         <strong>Votes</strong>
       </div>
       {Object.entries(voteFrequency).map(([uid, vote]) => (
-        <div key={uid} className="flex justify-between">
+        <div key={uid} className="flex justify-between gap-2">
           <span>{uid}</span>
           <span>{vote as number}</span>
         </div>
