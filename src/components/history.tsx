@@ -29,11 +29,11 @@ export const History = ({ history, sessionId }: HistoryProps) => {
     <div className="flex flex-col gap-4">
       <h2 className="text-2xl font-bold">History</h2>
       <ul className="flex flex-col gap-2 list-disc">
-        {stories.map(([uid, { startedAt }]) => (
+        {stories.map(([uid, { endedAt }]) => (
           <li key={uid} className="flex gap-4 max-w-[24ch]">
             <Button variant="link" size="auto" asChild>
               <Link to={`/pointing/${sessionId}/stats/${uid}`}>
-                <Moment dateTime={startedAt} />
+                <Moment dateTime={endedAt} />
               </Link>
             </Button>
           </li>

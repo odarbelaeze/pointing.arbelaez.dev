@@ -5,7 +5,7 @@ import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import { onValue, push, ref, set } from "firebase/database";
+import { onValue, push, ref, remove, set } from "firebase/database";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -43,7 +43,7 @@ export const PointingPage = () => {
     if (!session || session === "loading") {
       return false;
     }
-    return Object.keys(session.currentStory.participants || {}).every(
+    return Object.entries(session.currentStory.participants || {}).length > 0 && Object.keys(session.currentStory.participants || {}).every(
       (uid) => session.currentStory.votes && !!session.currentStory.votes[uid],
     );
   }, [session]);
@@ -64,6 +64,14 @@ export const PointingPage = () => {
     });
   }, [sessionId, session, db, allVoted]);
 
+  const [leaveState, leave] = useAsyncFn(async () => {
+    if (!sessionId || !user || user === "loading") {
+      return;
+    }
+    remove(ref(db, `sessions/${sessionId}/currentStory/participants/${user.uid}`));
+    remove(ref(db, `sessions/${sessionId}/currentStory/observers/${user.uid}`));
+  }, [sessionId, db, user]);
+
   if (!sessionId || session === null) {
     return <div>Invalid session</div>;
   }
@@ -72,10 +80,10 @@ export const PointingPage = () => {
     return <div>Loading...</div>;
   }
 
-  if (
-    !session.currentStory.participants ||
-    !session.currentStory.participants[user.uid]
-  ) {
+  const isParticipant = session.currentStory.participants && !!session.currentStory.participants[user.uid];
+  const isObserver = session.currentStory.observers && !!session.currentStory.observers[user.uid];
+
+  if (!isParticipant && !isObserver) {
     return <JoinSession sessionId={sessionId} />;
   }
 
@@ -83,13 +91,23 @@ export const PointingPage = () => {
     <div className="flex flex-col gap-8">
       <h1 className="text-4xl font-bold">Pointing stuff</h1>
       <div className="flex gap-2">
+        {isParticipant && (
+          <Button
+            disabled={clearState.loading || !allVoted}
+            onClick={clear}
+            variant="destructive"
+            className="flex-grow"
+          >
+            Clear votes
+          </Button>
+        )}
         <Button
-          disabled={clearState.loading || !allVoted}
-          onClick={clear}
+          disabled={leaveState.loading}
+          onClick={leave}
           variant="destructive"
           className="flex-grow"
         >
-          Clear votes
+          Leave
         </Button>
       </div>
       {allVoted ? (
@@ -100,7 +118,7 @@ export const PointingPage = () => {
           }}
         />
       ) : (
-        <Ballot sessionId={sessionId} />
+        session.currentStory.participants && !!session.currentStory.participants[user.uid] && <Ballot sessionId={sessionId} />
       )}
       <Tally story={session.currentStory} />
       <History sessionId={sessionId} history={session.history} />

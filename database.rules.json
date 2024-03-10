@@ -13,8 +13,17 @@
           },
           "participants": {
             "$participant": {
-              ".write": "auth.uid === $participant",
-              ".validate": "auth.uid === $participant",
+              "name": {
+                ".validate": "newData.isString() && newData.val().length <= 100"
+              },
+              "joinedAt": {
+                ".validate": "newData.isString() && newData.val().length <= 100"
+              },
+              "$other": { ".validate": false }
+            }
+          },
+          "observers": {
+            "$observer": {
               "name": {
                 ".validate": "newData.isString() && newData.val().length <= 100"
               },
@@ -42,6 +51,17 @@
             },
             "participants": {
               "$participant": {
+                "name": {
+                  ".validate": "newData.isString() && newData.val().length <= 100"
+                },
+                "joinedAt": {
+                  ".validate": "newData.isString() && newData.val().length <= 100"
+                },
+                "$other": { ".validate": false }
+              }
+            },
+            "observers": {
+              "$observer": {
                 "name": {
                   ".validate": "newData.isString() && newData.val().length <= 100"
                 },
