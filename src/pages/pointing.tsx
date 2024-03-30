@@ -5,7 +5,14 @@ import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import { onValue, push, ref, remove, set } from "firebase/database";
+import {
+  addDoc,
+  collection,
+  deleteField,
+  doc,
+  onSnapshot,
+  setDoc,
+} from "firebase/firestore";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -17,34 +24,43 @@ export const PointingPage = () => {
     null,
   );
 
-  const { db, user } = useFirebase();
+  const { firestore, user } = useFirebase();
 
   useEffect(() => {
     if (!sessionId) {
       return;
     }
-    const sessionRef = ref(db, `sessions/${sessionId}`);
-    const unsubscribe = onValue(sessionRef, (snapshot) => {
+    const sessionRef = doc(firestore, `pointing/${sessionId}`);
+    const unsubscribe = onSnapshot(sessionRef, (snapshot) => {
       if (!snapshot.exists()) {
         setSession(null);
         return;
       }
+      const data = snapshot.data();
       setSession({
         owner: "anonymous",
-        currentStory: {},
         history: {},
-        ...snapshot.val(),
+        ...data,
+        currentStory: {
+          ...data.currentStory,
+          startedAt: data.currentStory.startedAt.toDate(),
+          endedAt: data.currentStory.endedAt?.toDate(),
+        },
       });
     });
     return unsubscribe;
-  }, [sessionId, db]);
+  }, [sessionId, firestore]);
 
   const allVoted = useMemo(() => {
     if (!session || session === "loading") {
       return false;
     }
-    return Object.entries(session.currentStory.participants || {}).length > 0 && Object.keys(session.currentStory.participants || {}).every(
-      (uid) => session.currentStory.votes && !!session.currentStory.votes[uid],
+    return (
+      Object.entries(session.currentStory.participants || {}).length > 0 &&
+      Object.keys(session.currentStory.participants || {}).every(
+        (uid) =>
+          session.currentStory.votes && !!session.currentStory.votes[uid],
+      )
     );
   }, [session]);
 
@@ -54,23 +70,41 @@ export const PointingPage = () => {
     }
     const newStory = {
       ...session.currentStory,
-      endedAt: moment().utc().toISOString(),
+      endedAt: moment().utc().toDate(),
     };
-    await push(ref(db, `sessions/${sessionId}/history`), newStory);
-    await set(ref(db, `sessions/${sessionId}/currentStory`), {
-      ...session.currentStory,
-      votes: {},
-      startedAt: moment().utc().toISOString(),
-    });
-  }, [sessionId, session, db, allVoted]);
+    await addDoc(
+      collection(firestore, `pointing/${sessionId}/history`),
+      newStory,
+    );
+    await setDoc(
+      doc(firestore, `pointing/${sessionId}`),
+      {
+        currentStory: {
+          votes: {},
+          startedAt: moment().utc().toDate(),
+        },
+      },
+      { merge: true },
+    );
+  }, [sessionId, session, firestore, allVoted]);
 
   const [leaveState, leave] = useAsyncFn(async () => {
     if (!sessionId || !user || user === "loading") {
       return;
     }
-    remove(ref(db, `sessions/${sessionId}/currentStory/participants/${user.uid}`));
-    remove(ref(db, `sessions/${sessionId}/currentStory/observers/${user.uid}`));
-  }, [sessionId, db, user]);
+    const removeData = {
+      currentStory: {
+        participants: {
+          [user.uid]: deleteField(),
+        },
+        observers: {
+          [user.uid]: deleteField(),
+        },
+      },
+    };
+    const sessionRef = doc(firestore, `pointing/${sessionId}`);
+    await setDoc(sessionRef, removeData, { merge: true });
+  }, [sessionId, firestore, user]);
 
   if (!sessionId || session === null) {
     return <div>Invalid session</div>;
@@ -80,8 +114,12 @@ export const PointingPage = () => {
     return <div>Loading...</div>;
   }
 
-  const isParticipant = session.currentStory.participants && !!session.currentStory.participants[user.uid];
-  const isObserver = session.currentStory.observers && !!session.currentStory.observers[user.uid];
+  const isParticipant =
+    session.currentStory.participants &&
+    !!session.currentStory.participants[user.uid];
+  const isObserver =
+    session.currentStory.observers &&
+    !!session.currentStory.observers[user.uid];
 
   if (!isParticipant && !isObserver) {
     return <JoinSession sessionId={sessionId} />;
@@ -114,14 +152,17 @@ export const PointingPage = () => {
         <Stats
           story={{
             ...session.currentStory,
-            endedAt: moment().utc().toISOString(),
+            endedAt: moment().utc().toDate(),
           }}
         />
       ) : (
-        session.currentStory.participants && !!session.currentStory.participants[user.uid] && <Ballot sessionId={sessionId} />
+        session.currentStory.participants &&
+        !!session.currentStory.participants[user.uid] && (
+          <Ballot sessionId={sessionId} />
+        )
       )}
       <Tally story={session.currentStory} />
-      <History sessionId={sessionId} history={session.history} />
+      <History sessionId={sessionId} />
     </div>
   );
 };

@@ -1,29 +1,34 @@
 import { Stats } from "@/components/stats";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import { ref, onValue } from "firebase/database";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 export const StatsPage = () => {
   const { sessionId, storyId } = useParams();
   const [story, setStory] = useState<Story | "loading" | null>(null);
-  const { db } = useFirebase();
+  const { firestore } = useFirebase();
 
   useEffect(() => {
     if (!sessionId || !storyId) {
       return;
     }
-    const storyRef = ref(db, `sessions/${sessionId}/history/${storyId}`);
-    const unsubscribe = onValue(storyRef, (snapshot) => {
+    const storyRef = doc(firestore, `pointing/${sessionId}/history/${storyId}`);
+    const unsubscribe = onSnapshot(storyRef, (snapshot) => {
       if (!snapshot.exists()) {
         setStory(null);
         return;
       }
-      setStory(snapshot.val());
+      const data = snapshot.data();
+      setStory({
+        ...data,
+        startedAt: data.startedAt.toDate(),
+        endedAt: data.endedAt?.toDate(),
+      });
     });
     return unsubscribe;
-  }, [sessionId, storyId, db]);
+  }, [sessionId, storyId, firestore]);
 
   if (story === "loading") {
     return <div>Loading...</div>;

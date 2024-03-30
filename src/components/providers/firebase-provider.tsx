@@ -7,7 +7,7 @@ import {
   getAuth,
   signInAnonymously,
 } from "firebase/auth";
-import { connectDatabaseEmulator, getDatabase } from "firebase/database";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { ReactNode, createContext, useEffect, useMemo, useState } from "react";
 
 const firebaseConfig = {
@@ -32,13 +32,13 @@ const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider("6LfLTZApAAAAAMJH2libaBDoAkJat64-BEE2kGJk"),
   isTokenAutoRefreshEnabled: true,
 });
-const db = getDatabase(app);
+const firestore = getFirestore(app);
 const auth = getAuth(app);
 
 if (import.meta.env.VITE_USE_EMULATORS === "true") {
   console.info("Using firebase emulators");
   connectAuthEmulator(auth, "http://localhost:9099");
-  connectDatabaseEmulator(db, "localhost", 9000);
+  connectFirestoreEmulator(firestore, "localhost", 8080);
 }
 
 interface FirebaseProviderProps {
@@ -49,7 +49,7 @@ interface FirebaseProviderState {
   app: typeof app;
   analytics: typeof analytics;
   appCheck: typeof appCheck;
-  db: typeof db;
+  firestore: typeof firestore;
   auth: typeof auth;
   user: User | "loading" | null;
 }
@@ -58,7 +58,7 @@ const initialState: FirebaseProviderState = {
   app,
   analytics,
   appCheck,
-  db,
+  firestore,
   auth,
   user: null,
 };

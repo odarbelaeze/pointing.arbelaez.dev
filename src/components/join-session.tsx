@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFirebase } from "@/hooks/firebase";
-import { ref, set } from "firebase/database";
+import { doc, setDoc } from "firebase/firestore";
 import moment from "moment";
 import { useCallback, useState } from "react";
 import { useAsyncFn } from "react-use";
@@ -16,30 +16,38 @@ const validateName = (name: string) => {
 };
 
 export const JoinSession = ({ sessionId }: JoinSessionProps) => {
-  const { db, user } = useFirebase();
+  const { firestore, user } = useFirebase();
   const [name, setName] = useState("");
 
   const [joinState, join] = useAsyncFn(async () => {
     if (!user || user === "loading") {
       return;
     }
-    const participantRef = ref(
-      db,
-      `sessions/${sessionId}/currentStory/participants/${user.uid}`,
-    );
-    await set(participantRef, { name, joinedAt: moment().utc().toISOString() });
-  }, [name, sessionId, db, user]);
+    const participantData = {
+      currentStory: {
+        participants: {
+          [user.uid]: { name, joinedAt: moment().utc().toDate() },
+        }
+      }
+    }
+    const sessionRef = doc(firestore, `pointing/${sessionId}`);
+    await setDoc(sessionRef, participantData, { merge: true });
+  }, [name, sessionId, firestore, user]);
 
   const [observeState, observe] = useAsyncFn(async () => {
     if (!user || user === "loading") {
       return;
     }
-    const observerRef = ref(
-      db,
-      `sessions/${sessionId}/currentStory/observers/${user.uid}`,
-    );
-    await set(observerRef, { name, joinedAt: moment().utc().toISOString() });
-  }, [name, sessionId, db, user]);
+    const observerData = {
+      currentStory: {
+        observers: {
+          [user.uid]: { name, joinedAt: moment().utc().toDate() },
+        }
+      }
+    };
+    const sessionRef = doc(firestore, `pointing/${sessionId}`);
+    await setDoc(sessionRef, observerData, { merge: true });
+  }, [name, sessionId, firestore, user]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {

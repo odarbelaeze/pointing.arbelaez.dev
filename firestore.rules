@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidStory(story) {
+      return story is map
+          && story.keys().hasAll(['startedAt', 'participants', 'observers', 'votes'])
+          && story.keys().hasOnly(['startedAt', 'endedAt', 'participants', 'observers', 'votes'])
+          && story.startedAt is timestamp
+          && story.participants is map
+          && story.observers is map
+          && story.votes is map;
+    }
+    function isValidSession(session) {
+      return session is map
+          && session.keys().hasAll(['owner', 'currentStory'])
+          && session.keys().hasOnly(['owner', 'currentStory'])
+          && session.owner is string
+          && session.currentStory is map
+          && isValidStory(session.currentStory);
+    }
+    function participatesInStory(story) {
+      return request.auth.uid in story.participants
+          || request.auth.uid in story.observers;
+    }
+    match /pointing/{sessionId} {
+      allow read: if request.auth.uid != null;
+      allow create: if request.auth.uid != null
+                    && request.resource.data.owner == request.auth.uid
+                    && isValidSession(request.resource.data);
+      allow update: if request.auth != null
+                    && request.auth.uid == request.resource.data.owner
+                    && isValidSession(request.resource.data)
+                    && (
+                      participatesInStory(resource.data.currentStory)
+                      || participatesInStory(request.resource.data.currentStory)
+                    );
+      allow delete: if request.auth.uid == request.resource.data.owner;
+
+      match /history/{storyId} {
+        allow read: if request.auth.uid != null;
+        allow create: if request.auth.uid != null
+                      && isValidStory(request.resource.data)
+                      && participatesInStory(request.resource.data);
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
