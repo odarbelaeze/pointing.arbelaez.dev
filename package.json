@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start:emulators": "mkdir -p .emulators && firebase emulators:start --only auth,database,firestore --import=.emulators/",
+    "start:emulators": "mkdir -p .emulators && firebase emulators:start --only auth,firestore --import=.emulators/",
     "start:ui": "VITE_USE_EMULATORS=true vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
