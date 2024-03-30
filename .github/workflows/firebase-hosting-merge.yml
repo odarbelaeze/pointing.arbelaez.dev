@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 'lts/iron'
       - run: npm ci && npm run build
-      - run: echo $RAW_CREDENTIALS > '.credentials.json' && npm run firebase -- deploy --only firestore
+      - run: echo $RAW_CREDENTIALS > '.credentials.json' && npm run firebase -- --debug deploy --only firestore
         env:
           RAW_CREDENTIALS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_POINTING_STUFF }}
           GOOGLE_APPLICATION_CREDENTIALS: .credentials.json
