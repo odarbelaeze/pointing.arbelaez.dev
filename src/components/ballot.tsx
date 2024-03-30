@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import { ref, set } from "firebase/database";
+import { doc, setDoc } from "firebase/firestore";
 import { useAsyncFn } from "react-use";
 
 interface BallotProps {
@@ -8,18 +8,23 @@ interface BallotProps {
 }
 
 export const Ballot = ({ sessionId }: BallotProps) => {
-  const { db, user } = useFirebase();
+  const { firestore, user } = useFirebase();
   const [voteState, vote] = useAsyncFn(
     async (vote: number | "?") => {
       if (!sessionId || !vote || !user || user === "loading") {
         return;
       }
-      await set(
-        ref(db, `sessions/${sessionId}/currentStory/votes/${user.uid}`),
-        vote,
-      );
+      const voteData = {
+        currentStory: {
+          votes: {
+            [user.uid]: vote,
+          },
+        },
+      };
+      const sessionRef = doc(firestore, `pointing/${sessionId}`);
+      await setDoc(sessionRef, voteData, { merge: true });
     },
-    [sessionId, user, db],
+    [sessionId, user, firestore],
   );
   return (
     <div className="grid grid-cols-3 gap-2">

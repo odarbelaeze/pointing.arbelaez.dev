@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import { ref, push } from "firebase/database";
+import { addDoc, collection } from "firebase/firestore";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { useAsyncFn } from "react-use";
 
 export const HomePage = () => {
   const navigate = useNavigate();
-  const { db, user } = useFirebase();
+  const { firestore, user } = useFirebase();
 
   const [state, createSession] = useAsyncFn(async () => {
     if (!user || user === "loading") {
@@ -16,15 +16,18 @@ export const HomePage = () => {
     const newSession = {
       owner: user.uid,
       currentStory: {
-        startedAt: moment().utc().toISOString(),
+        startedAt: moment().utc().toDate(),
         participants: {},
+        observers: {},
         votes: {},
       },
-      history: {},
     };
-    const sessionRef = await push(ref(db, "sessions"), newSession);
-    navigate(`/pointing/${sessionRef.key}`);
-  }, [navigate, user, db]);
+    const sessionRef = await addDoc(
+      collection(firestore, "pointing"),
+      newSession,
+    );
+    navigate(`/pointing/${sessionRef.id}`);
+  }, [navigate, user, firestore]);
 
   return (
     <div className="flex flex-col gap-8 items-center">
