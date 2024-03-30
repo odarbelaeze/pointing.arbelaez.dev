@@ -22,7 +22,10 @@ export const HomePage = () => {
         votes: {},
       },
     };
-    const sessionRef = await addDoc(collection(firestore, "pointing"), newSession);
+    const sessionRef = await addDoc(
+      collection(firestore, "pointing"),
+      newSession,
+    );
     navigate(`/pointing/${sessionRef.id}`);
   }, [navigate, user, firestore]);
 

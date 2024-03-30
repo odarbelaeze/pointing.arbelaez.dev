@@ -27,9 +27,9 @@ export const JoinSession = ({ sessionId }: JoinSessionProps) => {
       currentStory: {
         participants: {
           [user.uid]: { name, joinedAt: moment().utc().toDate() },
-        }
-      }
-    }
+        },
+      },
+    };
     const sessionRef = doc(firestore, `pointing/${sessionId}`);
     await setDoc(sessionRef, participantData, { merge: true });
   }, [name, sessionId, firestore, user]);
@@ -42,8 +42,8 @@ export const JoinSession = ({ sessionId }: JoinSessionProps) => {
       currentStory: {
         observers: {
           [user.uid]: { name, joinedAt: moment().utc().toDate() },
-        }
-      }
+        },
+      },
     };
     const sessionRef = doc(firestore, `pointing/${sessionId}`);
     await setDoc(sessionRef, observerData, { merge: true });

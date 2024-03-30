@@ -20,7 +20,7 @@ export const Ballot = ({ sessionId }: BallotProps) => {
             [user.uid]: vote,
           },
         },
-      }
+      };
       const sessionRef = doc(firestore, `pointing/${sessionId}`);
       await setDoc(sessionRef, voteData, { merge: true });
     },

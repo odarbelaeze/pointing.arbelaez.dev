@@ -35,7 +35,8 @@ export const Tally = ({ story }: TallyProps) => {
                     {name}
                   </span>
                 </div>
-                {allVoted || story.votes && story.votes[uid] && uid === user.uid ? (
+                {allVoted ||
+                (story.votes && story.votes[uid] && uid === user.uid) ? (
                   <span>{story.votes && story.votes[uid]}</span>
                 ) : (
                   <div

@@ -16,7 +16,7 @@ interface ThemeProviderState {
 
 const initialState: ThemeProviderState = {
   theme: "system",
-  setTheme: () => { },
+  setTheme: () => {},
 };
 
 export const ThemeProviderContext =
@@ -58,7 +58,14 @@ export const ThemeProvider = ({
 
   return (
     <ThemeProviderContext.Provider value={value}>
-      <div className={cn("min-h-screen grid place-items-center bg-background text-foreground", { dark: finalTheme === "dark" })}>{children}</div>
+      <div
+        className={cn(
+          "min-h-screen grid place-items-center bg-background text-foreground",
+          { dark: finalTheme === "dark" },
+        )}
+      >
+        {children}
+      </div>
     </ThemeProviderContext.Provider>
   );
 };
