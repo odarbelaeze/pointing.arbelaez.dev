@@ -11,7 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/iron'
       - run: npm ci && npm run build
+      - run: echo ${{ secrets.FIREBASE_SERVICE_ACCOUNT_POINTING_STUFF }} > '.credentials.json' && npm run firebase -- deploy --only firestore
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: .credentials.json
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
