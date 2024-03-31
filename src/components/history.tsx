@@ -28,7 +28,7 @@ export const History = ({ sessionId }: HistoryProps) => {
     const queryRef = query(
       collection(firestore, `pointing/${sessionId}/history`),
       orderBy("startedAt", "desc"),
-      limit(100),
+      limit(100)
     );
     const unsubscribe = onSnapshot(queryRef, (snapshot) => {
       if (snapshot.empty) {
@@ -47,15 +47,11 @@ export const History = ({ sessionId }: HistoryProps) => {
               endedAt: data.endedAt.toDate(),
             },
           };
-        }),
+        })
       );
     });
     return unsubscribe;
   }, [sessionId, firestore, user]);
-
-  useEffect(() => {
-    console.log("History", history);
-  }, [history]);
 
   if (history === "loading") {
     return <div>Loading...</div>;
