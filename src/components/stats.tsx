@@ -1,5 +1,7 @@
 import moment from "moment";
 
+const PRECISION = 100;
+
 interface StatsProps {
   story: Story;
 }
@@ -15,7 +17,7 @@ export const Stats = ({ story }: StatsProps) => {
       ...acc,
       [v]: (acc[v as number] || 0) + 1,
     }),
-    {},
+    {}
   );
   return (
     <div className="flex flex-col gap-2 min-w-52">
@@ -29,16 +31,16 @@ export const Stats = ({ story }: StatsProps) => {
       </div>
       <div className="flex justify-between gap-2">
         <span>Average</span>
-        <span>{average}</span>
+        <span>{Math.round(average * PRECISION) / PRECISION}</span>
       </div>
       <div className="flex justify-between gap-2">
         <strong>Points</strong>
         <strong>Votes</strong>
       </div>
-      {Object.entries(voteFrequency).map(([uid, vote]) => (
-        <div key={uid} className="flex justify-between gap-2">
-          <span>{uid}</span>
-          <span>{vote as number}</span>
+      {Object.entries(voteFrequency).map(([vote, quantity]) => (
+        <div key={vote} className="flex justify-between gap-2">
+          <span>{vote}</span>
+          <span>{quantity as number}</span>
         </div>
       ))}
       {consensus && <div className="text-primary text-center">Consensus!</div>}
