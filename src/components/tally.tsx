@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import { deleteField, doc, setDoc } from "firebase/firestore";
+import { kick } from "@/lib/pointing";
 import { RxCheck, RxExit } from "react-icons/rx";
 import { useAsyncFn } from "react-use";
 
@@ -16,18 +16,9 @@ export const Tally = ({ sessionId, story }: TallyProps) => {
   );
   const participants = Object.entries(story.participants || {});
   const observers = Object.entries(story.observers || {});
-  const [kickState, kick] = useAsyncFn(
+  const [kickState, handleKick] = useAsyncFn(
     async (uid: string) => {
-      const kicked = {
-        currentStory: {
-          participants: {
-            [uid]: deleteField(),
-          },
-        },
-      };
-      await setDoc(doc(firestore, `pointing/${sessionId}`), kicked, {
-        merge: true,
-      });
+      await kick(firestore, sessionId, uid);
     },
     [firestore, sessionId],
   );
@@ -57,7 +48,7 @@ export const Tally = ({ sessionId, story }: TallyProps) => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => kick(uid)}
+                      onClick={() => handleKick(uid)}
                       disabled={kickState.loading}
                     >
                       <RxExit title="kick" aria-label="kick" />
