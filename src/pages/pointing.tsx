@@ -161,7 +161,7 @@ export const PointingPage = () => {
           <Ballot sessionId={sessionId} />
         )
       )}
-      <Tally story={session.currentStory} />
+      <Tally story={session.currentStory} sessionId={sessionId} />
       <History sessionId={sessionId} />
     </div>
   );
