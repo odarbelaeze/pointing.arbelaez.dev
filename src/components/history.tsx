@@ -1,13 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Moment } from "@/components/ui/moment";
 import { useFirebase } from "@/hooks/firebase";
-import {
-  collection,
-  limit,
-  onSnapshot,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { subscribeToHistory } from "@/lib/pointing";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -25,12 +19,7 @@ export const History = ({ sessionId }: HistoryProps) => {
     if (!sessionId || !user || user === "loading") {
       return;
     }
-    const queryRef = query(
-      collection(firestore, `pointing/${sessionId}/history`),
-      orderBy("startedAt", "desc"),
-      limit(100)
-    );
-    const unsubscribe = onSnapshot(queryRef, (snapshot) => {
+    const unsubscribe = subscribeToHistory(firestore, sessionId, (snapshot) => {
       if (snapshot.empty) {
         setHistory([]);
         return;
@@ -47,7 +36,7 @@ export const History = ({ sessionId }: HistoryProps) => {
               endedAt: data.endedAt.toDate(),
             },
           };
-        })
+        }),
       );
     });
     return unsubscribe;

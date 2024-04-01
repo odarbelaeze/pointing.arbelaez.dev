@@ -1,7 +1,7 @@
 import { Stats } from "@/components/stats";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import { doc, onSnapshot } from "firebase/firestore";
+import { subscribeToStory } from "@/lib/pointing";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -14,19 +14,23 @@ export const StatsPage = () => {
     if (!sessionId || !storyId) {
       return;
     }
-    const storyRef = doc(firestore, `pointing/${sessionId}/history/${storyId}`);
-    const unsubscribe = onSnapshot(storyRef, (snapshot) => {
-      if (!snapshot.exists()) {
-        setStory(null);
-        return;
-      }
-      const data = snapshot.data();
-      setStory({
-        ...data,
-        startedAt: data.startedAt.toDate(),
-        endedAt: data.endedAt?.toDate(),
-      });
-    });
+    const unsubscribe = subscribeToStory(
+      firestore,
+      sessionId,
+      storyId,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          setStory(null);
+          return;
+        }
+        const data = snapshot.data();
+        setStory({
+          ...data,
+          startedAt: data.startedAt.toDate(),
+          endedAt: data.endedAt?.toDate(),
+        });
+      },
+    );
     return unsubscribe;
   }, [sessionId, storyId, firestore]);
 

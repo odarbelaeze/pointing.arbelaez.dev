@@ -5,14 +5,7 @@ import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
-import {
-  addDoc,
-  collection,
-  deleteField,
-  doc,
-  onSnapshot,
-  setDoc,
-} from "firebase/firestore";
+import { clearVotes, kick, subscribeToSession } from "@/lib/pointing";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -30,8 +23,7 @@ export const PointingPage = () => {
     if (!sessionId) {
       return;
     }
-    const sessionRef = doc(firestore, `pointing/${sessionId}`);
-    const unsubscribe = onSnapshot(sessionRef, (snapshot) => {
+    const unsubscribe = subscribeToSession(firestore, sessionId, (snapshot) => {
       if (!snapshot.exists()) {
         setSession(null);
         return;
@@ -68,42 +60,14 @@ export const PointingPage = () => {
     if (!sessionId || !session || session === "loading" || !allVoted) {
       return;
     }
-    const newStory = {
-      ...session.currentStory,
-      endedAt: moment().utc().toDate(),
-    };
-    await addDoc(
-      collection(firestore, `pointing/${sessionId}/history`),
-      newStory,
-    );
-    await setDoc(
-      doc(firestore, `pointing/${sessionId}`),
-      {
-        currentStory: {
-          votes: {},
-          startedAt: moment().utc().toDate(),
-        },
-      },
-      { merge: true },
-    );
+    await clearVotes(firestore, sessionId, session.currentStory);
   }, [sessionId, session, firestore, allVoted]);
 
   const [leaveState, leave] = useAsyncFn(async () => {
     if (!sessionId || !user || user === "loading") {
       return;
     }
-    const removeData = {
-      currentStory: {
-        participants: {
-          [user.uid]: deleteField(),
-        },
-        observers: {
-          [user.uid]: deleteField(),
-        },
-      },
-    };
-    const sessionRef = doc(firestore, `pointing/${sessionId}`);
-    await setDoc(sessionRef, removeData, { merge: true });
+    await kick(firestore, sessionId, user.uid);
   }, [sessionId, firestore, user]);
 
   if (!sessionId || session === null) {
@@ -161,7 +125,7 @@ export const PointingPage = () => {
           <Ballot sessionId={sessionId} />
         )
       )}
-      <Tally story={session.currentStory} />
+      <Tally story={session.currentStory} sessionId={sessionId} />
       <History sessionId={sessionId} />
     </div>
   );
