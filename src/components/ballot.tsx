@@ -20,7 +20,7 @@ export const Ballot = ({ sessionId }: BallotProps) => {
   );
   return (
     <div className="grid grid-cols-3 gap-2">
-      {([1, 2, 3, 5, 8, 13, 21, 34, "?"] as (number | "?")[]).map((i) => (
+      {([0.5, 1, 2, 3, 5, 8, 13, 21, "?"] as (number | "?")[]).map((i) => (
         <Button
           disabled={voteState.loading}
           key={i}
