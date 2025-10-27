@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
 import { create } from "@/lib/pointing";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useAsyncFn } from "react-use";
 
 const HomePage = () => {
