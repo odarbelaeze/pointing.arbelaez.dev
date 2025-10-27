@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/hooks/firebase";
 import { subscribeToStory } from "@/lib/pointing";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 
 const StatsPage = () => {
   const { sessionId, storyId } = useParams();

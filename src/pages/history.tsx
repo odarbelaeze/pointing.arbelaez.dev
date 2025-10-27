@@ -3,7 +3,7 @@ import { Moment } from "@/components/ui/moment";
 import { useFirebase } from "@/hooks/firebase";
 import { subscribeToHistory } from "@/lib/pointing";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 
 const HistoryPage = () => {
   const { sessionId } = useParams();

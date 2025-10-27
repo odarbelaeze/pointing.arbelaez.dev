@@ -14,8 +14,12 @@ export const Tally = ({ sessionId, story }: TallyProps) => {
   const allVoted = Object.keys(story.participants || {}).every(
     (uid) => story.votes && !!story.votes[uid],
   );
-  const participants = Object.entries(story.participants || {});
-  const observers = Object.entries(story.observers || {});
+  const participants = Object.entries(story.participants || {}).sort((a, b) =>
+    a[1].name.localeCompare(b[1].name),
+  );
+  const observers = Object.entries(story.observers || {}).sort((a, b) =>
+    a[1].name.localeCompare(b[1].name),
+  );
   const [kickState, handleKick] = useAsyncFn(
     async (uid: string) => {
       await kick(firestore, sessionId, uid);

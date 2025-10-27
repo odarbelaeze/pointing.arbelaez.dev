@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
 
 const FirebaseProvider = React.lazy(
   () => import("@/providers/firebase-provider"),
@@ -9,28 +10,37 @@ const HistoryPage = React.lazy(() => import("@/pages/history"));
 const StatsPage = React.lazy(() => import("@/pages/stats"));
 const PointingPage = React.lazy(() => import("@/pages/pointing"));
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <HomePage />,
+    },
+    {
+      path: "/pointing/:sessionId",
+      element: <PointingPage />,
+    },
+    {
+      path: "/pointing/:sessionId/history",
+      element: <HistoryPage />,
+    },
+    {
+      path: "/pointing/:sessionId/stats/:storyId",
+      element: <StatsPage />,
+    },
+    {
+      path: "*",
+      element: <div>Not found</div>,
+    },
+  ],
   {
-    path: "/",
-    element: <HomePage />,
+    future: {
+      v7_relativeSplatPath: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+    },
   },
-  {
-    path: "/pointing/:sessionId",
-    element: <PointingPage />,
-  },
-  {
-    path: "/pointing/:sessionId/history",
-    element: <HistoryPage />,
-  },
-  {
-    path: "/pointing/:sessionId/stats/:storyId",
-    element: <StatsPage />,
-  },
-  {
-    path: "*",
-    element: <div>Not found</div>,
-  },
-]);
+);
 
 const App = () => {
   return (

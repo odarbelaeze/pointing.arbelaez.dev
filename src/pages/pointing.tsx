@@ -7,7 +7,7 @@ import { useFirebase } from "@/hooks/firebase";
 import { clearVotes, kick, subscribeToSession } from "@/lib/pointing";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import { useAsyncFn } from "react-use";
 
 const PointingPage = () => {
