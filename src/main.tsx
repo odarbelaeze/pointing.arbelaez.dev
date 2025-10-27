@@ -3,11 +3,9 @@ import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-const ThemeProvider = React.lazy(
-  () => import("@/components/providers/theme-provider"),
-);
+const ThemeProvider = React.lazy(() => import("@/providers/theme-provider"));
 const FirebaseProvider = React.lazy(
-  () => import("@/components/providers/firebase-provider"),
+  () => import("@/providers/firebase-provider"),
 );
 const HomePage = React.lazy(() => import("@/pages/home"));
 const HistoryPage = React.lazy(() => import("@/pages/history"));
