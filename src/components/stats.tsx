@@ -22,14 +22,6 @@ export const Stats = ({ story }: StatsProps) => {
   return (
     <div className="flex flex-col gap-2 min-w-52">
       <div className="flex justify-between gap-2">
-        <span>Time taken</span>{" "}
-        <span>
-          {moment
-            .duration(moment(story.endedAt).diff(moment(story.startedAt)))
-            .humanize()}
-        </span>
-      </div>
-      <div className="flex justify-between gap-2">
         <span>Average</span>
         <span>{Math.round(average * PRECISION) / PRECISION}</span>
       </div>
