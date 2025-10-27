@@ -17,7 +17,7 @@ export const Stats = ({ story }: StatsProps) => {
       ...acc,
       [v]: (acc[v as number] || 0) + 1,
     }),
-    {}
+    {},
   );
   return (
     <div className="flex flex-col gap-2 min-w-52">
