@@ -1,5 +1,3 @@
-import moment from "moment";
-
 const PRECISION = 100;
 
 interface StatsProps {
@@ -17,18 +15,10 @@ export const Stats = ({ story }: StatsProps) => {
       ...acc,
       [v]: (acc[v as number] || 0) + 1,
     }),
-    {}
+    {},
   );
   return (
     <div className="flex flex-col gap-2 min-w-52">
-      <div className="flex justify-between gap-2">
-        <span>Time taken</span>{" "}
-        <span>
-          {moment
-            .duration(moment(story.endedAt).diff(moment(story.startedAt)))
-            .humanize()}
-        </span>
-      </div>
       <div className="flex justify-between gap-2">
         <span>Average</span>
         <span>{Math.round(average * PRECISION) / PRECISION}</span>

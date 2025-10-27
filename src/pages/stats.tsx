@@ -5,7 +5,7 @@ import { subscribeToStory } from "@/lib/pointing";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-export const StatsPage = () => {
+const StatsPage = () => {
   const { sessionId, storyId } = useParams();
   const [story, setStory] = useState<Story | "loading" | null>(null);
   const { firestore } = useFirebase();
@@ -54,3 +54,5 @@ export const StatsPage = () => {
     </div>
   );
 };
+
+export default StatsPage;

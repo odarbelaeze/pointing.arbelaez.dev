@@ -79,14 +79,14 @@ export const JoinSession = ({ sessionId }: JoinSessionProps) => {
             onClick={observe}
             variant="secondary"
             type="button"
-            className="flex-grow"
+            className="grow"
           >
             Observe
           </Button>
           <Button
             disabled={!validateName(name) || joinState.loading}
             type="submit"
-            className="flex-grow"
+            className="grow"
           >
             Join
           </Button>

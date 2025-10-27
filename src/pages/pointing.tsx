@@ -1,5 +1,4 @@
 import { Ballot } from "@/components/ballot";
-import { History } from "@/components/history";
 import { JoinSession } from "@/components/join-session";
 import { Stats } from "@/components/stats";
 import { Tally } from "@/components/tally";
@@ -8,10 +7,10 @@ import { useFirebase } from "@/hooks/firebase";
 import { clearVotes, kick, subscribeToSession } from "@/lib/pointing";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAsyncFn } from "react-use";
 
-export const PointingPage = () => {
+const PointingPage = () => {
   const { sessionId } = useParams();
   const [session, setSession] = useState<PointingSession | "loading" | null>(
     null,
@@ -98,7 +97,7 @@ export const PointingPage = () => {
             disabled={clearState.loading || !allVoted}
             onClick={clear}
             variant="destructive"
-            className="flex-grow"
+            className="grow"
           >
             Clear votes
           </Button>
@@ -107,7 +106,7 @@ export const PointingPage = () => {
           disabled={leaveState.loading}
           onClick={leave}
           variant="destructive"
-          className="flex-grow"
+          className="grow"
         >
           Leave
         </Button>
@@ -126,7 +125,11 @@ export const PointingPage = () => {
         )
       )}
       <Tally story={session.currentStory} sessionId={sessionId} />
-      <History sessionId={sessionId} />
+      <Button variant="link" size="auto" asChild>
+        <Link to={`/pointing/${sessionId}/history`}>History</Link>
+      </Button>
     </div>
   );
 };
+
+export default PointingPage;
