@@ -28,10 +28,6 @@ if (import.meta.env.MODE === "development") {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN =
     import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN;
 }
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider("6LfLTZApAAAAAMJH2libaBDoAkJat64-BEE2kGJk"),
-  isTokenAutoRefreshEnabled: true,
-});
 const firestore = getFirestore(app);
 const auth = getAuth(app);
 
@@ -39,6 +35,13 @@ if (import.meta.env.VITE_USE_EMULATORS === "true") {
   console.info("Using firebase emulators");
   connectAuthEmulator(auth, "http://localhost:9099");
   connectFirestoreEmulator(firestore, "localhost", 8080);
+} else {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(
+      "6LfLTZApAAAAAMJH2libaBDoAkJat64-BEE2kGJk",
+    ),
+    isTokenAutoRefreshEnabled: true,
+  });
 }
 
 interface FirebaseProviderProps {
@@ -48,7 +51,6 @@ interface FirebaseProviderProps {
 interface FirebaseProviderState {
   app: typeof app;
   analytics: typeof analytics;
-  appCheck: typeof appCheck;
   firestore: typeof firestore;
   auth: typeof auth;
   user: User | "loading" | null;
@@ -57,7 +59,6 @@ interface FirebaseProviderState {
 const initialState: FirebaseProviderState = {
   app,
   analytics,
-  appCheck,
   firestore,
   auth,
   user: null,

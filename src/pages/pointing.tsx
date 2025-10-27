@@ -97,7 +97,7 @@ const PointingPage = () => {
             disabled={clearState.loading || !allVoted}
             onClick={clear}
             variant="destructive"
-            className="flex-grow"
+            className="grow"
           >
             Clear votes
           </Button>
@@ -106,7 +106,7 @@ const PointingPage = () => {
           disabled={leaveState.loading}
           onClick={leave}
           variant="destructive"
-          className="flex-grow"
+          className="grow"
         >
           Leave
         </Button>

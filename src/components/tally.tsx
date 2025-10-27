@@ -36,11 +36,11 @@ export const Tally = ({ sessionId, story }: TallyProps) => {
                 key={uid}
                 className="flex gap-4 items-center justify-between max-w-[24ch]"
               >
-                <div className="flex items-center gap-1 flex-grow">
+                <div className="flex items-center gap-1 grow">
                   {story.votes && !!story.votes[uid] && <RxCheck />}
                   <span
                     title={name}
-                    className="whitespace-nowrap overflow-hidden overflow-ellipsis flex-grow"
+                    className="whitespace-nowrap overflow-hidden text-ellipsis grow"
                   >
                     {name}
                   </span>
@@ -60,7 +60,7 @@ export const Tally = ({ sessionId, story }: TallyProps) => {
                   <span>{story.votes && story.votes[uid]}</span>
                 ) : (
                   <div
-                    className="flex-shrink-0 bg-foreground w-8 h-4 rounded-md"
+                    className="shrink-0 bg-foreground w-8 h-4 rounded-md"
                     aria-label="hidden vote"
                   />
                 )}
@@ -80,7 +80,7 @@ export const Tally = ({ sessionId, story }: TallyProps) => {
               >
                 <span
                   title={name}
-                  className="whitespace-nowrap overflow-hidden overflow-ellipsis"
+                  className="whitespace-nowrap overflow-hidden text-ellipsis"
                 >
                   {name}
                 </span>
