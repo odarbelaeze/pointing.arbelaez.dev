@@ -3,13 +3,10 @@ import { Moment } from "@/components/ui/moment";
 import { useFirebase } from "@/hooks/firebase";
 import { subscribeToHistory } from "@/lib/pointing";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-interface HistoryProps {
-  sessionId: string;
-}
-
-export const History = ({ sessionId }: HistoryProps) => {
+const HistoryPage = () => {
+  const { sessionId } = useParams();
   const { firestore, user } = useFirebase();
   const [history, setHistory] = useState<
     { id: string; story: Story }[] | "loading"
@@ -51,7 +48,12 @@ export const History = ({ sessionId }: HistoryProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-8">
+      <div>
+        <Button variant="link" size="auto" asChild>
+          <Link to={`/pointing/${sessionId}`}>Back</Link>
+        </Button>
+      </div>
       <h2 className="text-2xl font-bold">History</h2>
       <ul className="flex flex-col gap-2 list-disc">
         {history.map(({ id, story }) => (
@@ -67,3 +69,5 @@ export const History = ({ sessionId }: HistoryProps) => {
     </div>
   );
 };
+
+export default HistoryPage;

@@ -23,7 +23,7 @@ export const ThemeProviderContext =
   createContext<ThemeProviderState>(initialState);
 ThemeProviderContext.displayName = "ThemeProviderContext";
 
-export const ThemeProvider = ({
+const ThemeProvider = ({
   children,
   defaultTheme = "system",
   storageKey = "pointing-theme",
@@ -69,3 +69,5 @@ export const ThemeProvider = ({
     </ThemeProviderContext.Provider>
   );
 };
+
+export default ThemeProvider;

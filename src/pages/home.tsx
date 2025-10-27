@@ -4,7 +4,7 @@ import { create } from "@/lib/pointing";
 import { useNavigate } from "react-router-dom";
 import { useAsyncFn } from "react-use";
 
-export const HomePage = () => {
+const HomePage = () => {
   const navigate = useNavigate();
   const { firestore, user } = useFirebase();
 
@@ -24,3 +24,5 @@ export const HomePage = () => {
     </div>
   );
 };
+
+export default HomePage;

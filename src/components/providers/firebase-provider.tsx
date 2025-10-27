@@ -67,7 +67,7 @@ export const FirebaseContext =
   createContext<FirebaseProviderState>(initialState);
 FirebaseContext.displayName = "FirebaseContext";
 
-export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
+const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
   const [user, setUser] = useState<User | "loading" | null>("loading");
   const value = useMemo(() => ({ ...initialState, user }), [user]);
 
@@ -101,3 +101,5 @@ export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
     </FirebaseContext.Provider>
   );
 };
+
+export default FirebaseProvider;
